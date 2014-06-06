@@ -33,7 +33,19 @@ entry:
 	MOV		SS,AX
 	MOV		SP,0x7c00
 	MOV		DS,AX
+
+;ディスクを読む
+	MOV		AX,0x8020
 	MOV		ES,AX
+	MOV		CH,0 	;シリンダ0
+	MOV		DH,0 	;ヘッド0
+	MOV		CL,2 	;セクタ2
+	MOV		AH,0x02 ;ディスク読み込み
+	MOV		AL,1 	;1セクタ
+	MOV		BX,0 	;バッファアドレス=読み出したデータを保存する場所
+	MOV		DL,0x00 ;Aドライブ
+	INT		0x13
+	JC		error
 
 	MOV		SI,msg
 putloop:
