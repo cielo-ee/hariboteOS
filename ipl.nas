@@ -24,7 +24,7 @@ CYLS	EQU		10				; どこまで読み込むか
 		DD		2880
 		DB		0,0,0x29
 		DD		0xffffffff
-		DB		"HELLO-OS   "
+		DB		"HARIBOTEOS "
 		DB		"FAT12   "
 		RESB	18
 
@@ -37,14 +37,14 @@ entry:
 		MOV		DS,AX
 
 ;ディスクを読む
-		MOV		AX,0x8020
+
+		MOV		AX,0x0820
 		MOV		ES,AX
 		MOV		CH,0 	;シリンダ0
 		MOV		DH,0 	;ヘッド0
 		MOV		CL,2 	;セクタ2
 readloop:
 		MOV		SI,0	;失敗回数を数える
-
 retry:
 		MOV		AH,0x02 ;ディスク読み込み
 		MOV		AL,1 	;1セクタ
@@ -59,7 +59,6 @@ retry:
 		MOV		DL,0x00	;Aドライブ
 		INT		0x13	;ドライブのリセット
 		JMP		retry
-
 next:
 		MOV		AX,ES ;アドレスを0x200進める
 		ADD		AX,0x0020
@@ -76,15 +75,14 @@ next:
 		CMP		CH,CYLS
 		JB		readloop 
 
-fin:
-		HLT
-		JMP		fin ;無限ループ
+; 読み終わったのでharibote.sysを実行だ！！！！！！！！！！！！！！！
+
+		JMP		0xc200
 
 error:
 		MOV		AX,0
 		MOV		ES,AX
-		MOV		SI,msg
-		
+		MOV		SI,msg		
 putloop:
 		MOV		AL,[SI]
 		ADD		SI,1
@@ -94,15 +92,17 @@ putloop:
 		MOV		BX,15	;B8 0F
 		INT		0x10	;CD 10
 		JMP		putloop
-
-
+fin:
+		HLT						; 何かあるまでCPUを停止させる
+		JMP		fin				; 無限ループ
 msg:
-		DB		0x0a,0x0a
-		DB		"Hello, world"
+		DB		0x0a, 0x0a
+		DB		"load error"
 		DB		0x0a
 		DB		0
 
 		RESB	0x7dfe-$
 
-		DB		0x55,0xaa
+		DB		0x55, 0xaa
 
+　
