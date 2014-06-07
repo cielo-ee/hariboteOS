@@ -9,7 +9,7 @@ CYLS	EQU		10				; どこまで読み込むか
 
 		JMP		entry
 		DB		0x90
-		DB		"HELLOIPL"
+		DB		"HALIBOTE"
 		DW		512
 		DB		1
 		DW		1
@@ -77,6 +77,7 @@ next:
 
 ; 読み終わったのでharibote.sysを実行だ！！！！！！！！！！！！！！！
 
+		MOV		[0x0ff0],CH		; IPLがどこまで読んだのかをメモ
 		JMP		0xc200
 
 error:
