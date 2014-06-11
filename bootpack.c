@@ -11,7 +11,7 @@ void HariMain(void)
 		
 		init_gdtidt();
 		init_pic();
-		io_sti; /* CPU‚ÌŠ„‚è‚İ‹Ö~‚ğ‰ğœ*/
+		io_sti(); /* CPU‚ÌŠ„‚è‚İ‹Ö~‚ğ‰ğœ*/
 		
 		init_palette();
 		init_screen8(binfo->vram, binfo->scrnx, binfo->scrny);

@@ -5,7 +5,7 @@
 [BITS 32]		;32bitモード用の機械語を作る
 [FILE "naskfunc.nas"]
 
-		GLOBAL _io_hlt, _io_cli,io_sti,io_stihlt
+		GLOBAL _io_hlt, _io_cli,_io_sti,io_stihlt ;なぜio_stihltだけ_がつかない？
 		GLOBAL _io_in8, _io_in16, _io_in32
 		GLOBAL _io_out8,_io_out16,_io_out32
 		GLOBAL _io_load_eflags, _io_store_eflags 
