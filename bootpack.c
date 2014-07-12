@@ -29,11 +29,11 @@ void HariMain(void)
 		
 		for(;;){
 				io_cli(); /*Š„‚èž‚Ý‹ÖŽ~*/
-				if(keybuf.flag == 0){
+				if(keybuf.next == 0){
 						io_stihlt();
 				}else{
-						i = keybuf.data;
-						keybuf.flag = 0;
+						i = keybuf.data[0];
+						keybuf.next--;
 						io_sti();
 						sprintf(s, "%02X",i);
 						boxfill8(binfo->vram,binfo->scrnx,COL8_008484,0,16,15,31);
