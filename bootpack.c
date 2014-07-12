@@ -29,11 +29,15 @@ void HariMain(void)
 		
 		for(;;){
 				io_cli(); /*Š„‚èž‚Ý‹ÖŽ~*/
-				if(keybuf.next == 0){
+				if(keybuf.len == 0){
 						io_stihlt();
 				}else{
-						i = keybuf.data[0];
-						keybuf.next--;
+						i = keybuf.data[keybuf.next_r];
+						keybuf.len--;
+						keybuf.next_r++;
+						if(keybuf.next_r == 32){
+								keybuf.next_r = 0;
+						}
 						io_sti();
 						sprintf(s, "%02X",i);
 						boxfill8(binfo->vram,binfo->scrnx,COL8_008484,0,16,15,31);
