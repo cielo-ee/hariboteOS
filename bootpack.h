@@ -1,5 +1,38 @@
-#include<stdio.h>
+/* asmhead.nas */
+struct BOOTINFO { /* 0x0ff0-0x0fff */
+	char cyls; /* ブートセクタはどこまでディスクを読んだのか */
+	char leds; /* ブート時のキーボードのLEDの状態 */
+	char vmode; /* ビデオモード  何ビットカラーか */
+	char reserve;
+	short scrnx, scrny; /* 画面解像度 */
+	char *vram;
+};
+#define ADR_BOOTINFO	0x00000ff0
 
+/* naskfunc.nas */
+void io_hlt(void);
+void io_cli(void);
+void io_sti(void);
+void io_stihlt(void);
+int io_in8(int port);
+void io_out8(int port, int data);
+int io_load_eflags(void);
+void io_store_eflags(int eflags);
+void load_gdtr(int limit, int addr);
+void load_idtr(int limit, int addr);
+void asm_inthandler21(void);
+void asm_inthandler2c(void);
+
+/* graphic.c */
+void init_palette(void);
+void set_palette(int start, int end, unsigned char *rgb);
+void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
+void init_screen8(char *vram, int x, int y);
+void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
+void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
+void init_mouse_cursor8(char *mouse, char bc);
+void putblock8_8(char *vram, int vxsize, int pxsize,
+	int pysize, int px0, int py0, char *buf, int bxsize);
 #define COL8_000000		0
 #define COL8_FF0000		1
 #define COL8_00FF00		2
@@ -17,51 +50,20 @@
 #define COL8_008484		14
 #define COL8_848484		15
 
-struct SEGMENT_DESCRIPTOR{
-		short limit_low,base_low; /* 2byte */
-		char  base_mid,access_right; /* 1byte */
-		char  limit_high,base_high;  
+/* dsctbl.c */
+struct SEGMENT_DESCRIPTOR {
+	short limit_low, base_low;
+	char base_mid, access_right;
+	char limit_high, base_high;
 };
-
-struct GATE_DESCRIPTOR{
-		short offset_low,selector;
-		char  dw_count,access_right;
-		short offset_high;
+struct GATE_DESCRIPTOR {
+	short offset_low, selector;
+	char dw_count, access_right;
+	short offset_high;
 };
-
-struct BOOTINFO {
-	char cyls, leds, vmode, reserve;
-	short scrnx, scrny;
-	char *vram;
-};
-#define ADR_BOOTINFO	0x00000ff0
-
-void io_hlt(void);
-void io_cli(void);                /*clear interrupt flag */
-void io_sti(void);
-void io_out8(int port,int data); /*port番号で指定した装置にdataを送りつける*/
-int  io_load_eflags(void);
-void io_store_eflags(int eflags);
-void load_gdtr(int limit, int addr);
-void load_idtr(int limit, int addr);
-void asm_inthandler21(void);
-void asm_inthandler2c(void);
-
-void init_palette(void);
-void set_palette(int start,int end,unsigned char *rgp);
-void boxfill8(unsigned char *vram,int xsize,unsigned char c, int x0,int y0,int x1,int y1);
-void init_screen8(char *vram,int x,int y);
-void putfont8(char *vram,int xsize,int x,int y, char c, char *font);
-void putfonts8_asc(char *vram, int xsize, int x,int y,char c,unsigned char *s);
-void init_mouse_cursor8(char *mouse, char bc);
-void putblock8_8(char *vram, int vxsize, int pxsize,
-	int pysize, int px0, int py0, char *buf, int bxsize);
-
 void init_gdtidt(void);
 void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar);
 void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
-void load_gdtr(int limit, int addr);
-void load_idtr(int limit, int addr);
 #define ADR_IDT			0x0026f800
 #define LIMIT_IDT		0x000007ff
 #define ADR_GDT			0x00270000
@@ -73,6 +75,9 @@ void load_idtr(int limit, int addr);
 #define AR_INTGATE32	0x008e
 
 /* int.c */
+struct KEYBUF {
+	unsigned char data, flag;
+};
 void init_pic(void);
 void inthandler21(int *esp);
 void inthandler2c(int *esp);
